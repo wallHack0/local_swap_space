@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <!-- Displaying user details -->
+  <h1>User profile: {{ profile_user.username }}</h1>
+  <p>Email: {{ profile_user.email }}</p>
+  <p>City: {{ profile_user.city }}</p>
+  <p>Average rating: {{ average_rating }}</p>
+    
+  <a href="{% url 'add_item' %}">Add new item</a>
+
+  <!-- List of user's items -->
+  <h2>My items</h2>
+  <ul>
+    {% for item in items %}
+      <li>
+        <a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a> - {{ item.description }}
+        {% if item.images.all %}
+          <!-- Link and image for the item, wrapping image in a link -->
+          <a href="{% url 'item-detail' pk=item.pk %}">
+            <img src="{{ item.images.all.0.image.url }}" alt="{{ item.name }}" style="width:100px; height:auto;">
+          </a>
+        {% else %}
+          <!-- Fallback image if no images are associated with the item -->
+          <img src="{% static 'path/to/default/image.jpg' %}" alt="Default Image" style="width:100px; height:auto;">
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>You have no items yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

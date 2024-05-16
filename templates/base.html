@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Ensures proper scaling and rendering on different devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title can be overridden by child templates -->
+    <title>{% block title %}My App{% endblock %}</title>
+</head>
+<body>
+<header>
+    <nav>
+        <!-- Navigation links for the website -->
+        <ul>
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'liked_items' %}">Liked Items</a></li>
+            <li><a href="{% url 'match_list' %}">Matches</a></li>
+            <li><a href="{% url 'profile' %}">My Profile</a></li>
+            <!-- Conditionally display navigation items based on user authentication status -->
+            {% if request.user.is_authenticated %}
+            <li>
+                <!-- Logout button -->
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit"
+                            style="background: none; border: none; padding: 0; color: blue; text-decoration: underline; cursor: pointer;">
+                        Logout
+                    </button>
+                </form>
+            </li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <!-- Main content block for child templates -->
+    {% block content %}
+    <!-- Placeholder -->
+    {% endblock %}
+</main>
+
+<footer>
+    <!-- Footer information -->
+    <p>&copy; 2024 Sebastian S</p>
+</footer>
+
+</body>
+</html>

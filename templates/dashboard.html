@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Dashboard - {{ request.user.username }} <!-- Dynamically set the page title using the username -->
+{% endblock %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}"> <!-- Displays system messages -->
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div>
+        <h2>Items to Explore</h2> <!-- Subheading for the item exploration section -->
+        <form method="GET" class="filter-form">
+            <label for="category">Filter by Category:</label> <!-- Category filter -->
+            <select id="category" name="category" onchange="this.form.submit();">
+                <option value="">All Categories</option> <!-- Default selection for all categories -->
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
+                        {{ category.name }} <!-- Option for each category -->
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="distance">Max distance (km):</label> <!-- Input for filtering by maximum distance -->
+            <input type="number" id="distance" name="distance" value="{{ request.GET.distance }}" placeholder="Enter max distance">
+
+            <button type="submit">Filter</button>
+            <button type="submit" name="reset" value="1">Reset Filters</button> <!-- Button to reset filters -->
+        </form>
+
+        <ul id="items-list">
+            {% for item in items %}
+                <li>
+                    <strong><a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a></strong> - {{ item.description }} <!-- Item name and description with a link to its detail page -->
+                    {% for image in item.images.all %}
+                        <a href="{% url 'item-detail' pk=item.pk %}"><img src="{{ image.image.url }}" alt="{{ item.name }}" style="width:100px; height:auto;"></a> <!-- Display all images associated with the item -->
+                    {% endfor %}
+                    
+                    <p>Distance: {{ item.distance.km|floatformat:2 }} km</p> <!-- Display the distance to the item -->
+                    
+                    <form action="{% url 'like-item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Like</button> <!-- Button to like an item -->
+                    </form>
+                </li>
+                {% empty %}
+                <li>No items available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

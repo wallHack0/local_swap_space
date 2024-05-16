@@ -1,0 +1,24 @@
+{% extends 'base.html' %} 
+
+{% block title %}Chat Detail{% endblock %} 
+
+{% block content %}
+<h1>Chat with {% if request.user == chat.participant_one %}{{ chat.participant_two.username }}{% else %}{{ chat.participant_one.username }}{% endif %}</h1>
+<!-- Header displaying with whom the user is chatting, dynamically showing the other participant -->
+
+<div class="messages">
+    {% for message in messages %}
+        <p><strong>{{ message.sender.username }}:</strong> {{ message.text }} ({{ message.sent_at }})</p>
+    <!-- Loop through each message in the chat and display the sender's username, message text, and the timestamp -->
+    {% empty %}
+        <p>No messages yet.</p>
+    {% endfor %}
+</div>
+
+<form action="{% url 'send_message' chat_id=chat.pk %}" method="post">
+    {% csrf_token %}
+    <textarea name="message_text" placeholder="Type your message here..."></textarea>
+    <!-- Textarea for entering a new message -->
+    <button type="submit">Send</button>
+</form>
+{% endblock %}

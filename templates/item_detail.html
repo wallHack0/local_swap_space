@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Item details{% endblock %}
+
+{% block content %}
+    <div class="item-detail">
+        <h1>{{ item.name }}</h1>
+        <p><strong>Owner:</strong> <a href="{% url 'other-user-profile' username=item.owner.username %}">{{ item.owner.username }}</a></p>
+        <p><strong>Category:</strong> {{ item.category }}</p>
+        <p><strong>Description:</strong> {{ item.description }}</p>
+        <p><strong>Status:</strong> {{ item.status }}</p>
+
+        {% if item_images %}
+        <div class="item-images">
+            {% for image in item_images %}
+                <img src="{{ image.image.url }}" alt="{{ item.name }}" style="width: 100px; height: auto;">
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if item.owner != request.user %}
+        <form action="{% url 'like-item' item.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Like</button>
+        </form>
+        {% endif %}
+
+        {% if item.owner == request.user %}
+        <a href="{% url 'edit_item' pk=item.pk %}">Edit this item</a> <!-- Link to edit the item if the user is the owner -->
+        {% endif %}
+    </div>
+{% endblock %}

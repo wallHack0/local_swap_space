@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>Register</h2>
+
+<!-- Page description -->
+<p>Welcome to LocalSwapSpace! Join our community where you can swap items locally. For the safest and most effective experience, we recommend that exchanges be made in person whenever possible.</p>
+
+<!-- Registration form -->
+<form method="post" id="registrationForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button> 
+</form>
+    
+<script src="{% static 'js/geolocation.js' %}"></script>
+{% endblock %}

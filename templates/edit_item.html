@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Item{% endblock %}
+
+{% block content %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}"> <!-- Display system messages -->
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2>Edit Item</h2>
+    <h3>{{ item.name }}</h3> <!-- Display the name of the item being edited -->
+
+    <form method="post" enctype="multipart/form-data"> <!-- Form for submitting item updates -->
+        {% csrf_token %}
+        {{ form.as_p }} <!-- Render the item form fields as paragraphs -->
+        <button type="submit">Update</button>
+    </form>
+
+    <h4>Current Images</h4> <!-- Heading for current images section -->
+    {% for image in item_images %}
+        <div>
+            <img src="{{ image.image.url }}" alt="Image" style="width: 100px; height: auto;"> <!-- Display each current image -->
+            <a href="{% url 'delete_image' image.id %}">Delete</a> <!-- Link to delete an image -->
+        </div>
+    {% endfor %}
+
+    <h4>Add New Image</h4> <!-- Heading for adding new images -->
+    <form method="post" action="{% url 'add_image' item.id %}" enctype="multipart/form-data"> <!-- Form to add new images -->
+        {% csrf_token %}
+        <input type="file" name="image">
+        <button type="submit">Add Image</button>
+    </form>
+
+{% endblock %}
