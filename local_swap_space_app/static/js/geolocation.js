@@ -1,21 +1,21 @@
-// Nasłuchiwanie na zdarzenie 'submit' w formularzu rejestracji.
+// Listening for the 'submit' event on the registration form.
 document.getElementById('registrationForm').addEventListener('submit', function (event) {
-    // Sprawdzenie, czy w przeglądarce dostępna jest geolokalizacja.
+    // Checking if geolocation is available in the browser.
     if (navigator.geolocation) {
-        // Zapobieganie domyślnemu zachowaniu wysyłania formularza, aby najpierw uzyskać geolokalizację.
+        // Preventing the default form submission behavior to first obtain geolocation.
         event.preventDefault();
 
-        // Próba pobrania aktualnej pozycji geograficznej użytkownika.
+        // Attempting to get the current geographic position of the user.
         navigator.geolocation.getCurrentPosition(function (position) {
             let latitude = position.coords.latitude;
             let longitude = position.coords.longitude;
 
-            // Tworzenie ukrytch inputów do przechowywania szerokości i długości geograficznej.
+            // Creating hidden inputs to store latitude and longitude.
             let hiddenLat = document.createElement('input');
             hiddenLat.setAttribute('type', 'hidden');
             hiddenLat.setAttribute('name', 'latitude');
             hiddenLat.value = latitude;
-            // Dołączanie ukrytego inputu do formularza.
+            // Appending the hidden input to the form.
             document.getElementById('registrationForm').appendChild(hiddenLat);
 
             let hiddenLong = document.createElement('input');
@@ -24,12 +24,12 @@ document.getElementById('registrationForm').addEventListener('submit', function 
             hiddenLong.value = longitude;
             document.getElementById('registrationForm').appendChild(hiddenLong);
 
-            // Ponowne wysłanie formularza po dodaniu ukrytych inputów.
+            // Submitting the form again after adding the hidden inputs.
             document.getElementById('registrationForm').submit();
 
         }, function (error) {
             console.log("Błąd: ", error);
-            // Wysłanie formularza nawet w przypadku błędu podczas pobierania geolokalizacji.
+            // Submitting the form even if there's an error while obtaining geolocation.
             document.getElementById('registrationForm').submit();
         });
     }
