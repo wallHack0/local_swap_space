@@ -18,7 +18,6 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 # User authentication form.
-# User authentication form.
 class CustomAuthenticationForm(AuthenticationForm):
     latitude = forms.CharField(
         required=False,
