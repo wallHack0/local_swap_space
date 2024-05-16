@@ -223,9 +223,6 @@ class ItemUpdateView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('item-detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
-        """
-        Extends the base method to add a success message after the item is successfully updated.
-        """
         messages.success(self.request, "Przedmiot został pomyślnie zaktualizowany!")
         return super().form_valid(form)
 
