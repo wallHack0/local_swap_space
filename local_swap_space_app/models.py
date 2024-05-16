@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 # User model with city and geolocation parameters.
 class User(AbstractUser):
     city = models.CharField(max_length=100, blank=True, verbose_name="City")
-    latitude = models.FloatField(null=True, blank=True, verbose_name="Szerokość geograficzna")
-    longitude = models.FloatField(null=True, blank=True, verbose_name="Długość geograficzna")
-    location = geomodels.PointField(geography=True, null=True, blank=True, verbose_name="Lokalizacja")
+    latitude = models.FloatField(null=True, blank=True, verbose_name="latitude")
+    longitude = models.FloatField(null=True, blank=True, verbose_name="longitude")
+    location = geomodels.PointField(geography=True, null=True, blank=True, verbose_name="location")
 
     def save(self, *args, **kwargs):
         # Custom save method to automatically update the 'location' field based on latitude and longitude.
