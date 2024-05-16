@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from local_swap_space_app.views import (RegisterView, CustomLoginView, DashboardView, ItemDetailView, AddItemView,
-                                        ItemUpdateView, AddImageView, DeleteImageView, UserProfileView,
+                                        ItemUpdateView, DeleteItemView,AddImageView, DeleteImageView, UserProfileView,
                                         OtherUserProfileView, LikedItemsView, like_item, MatchUserListView, ChatView,
                                         send_message, delete_chat_and_related_data)
 
@@ -33,6 +33,7 @@ urlpatterns = [
     path('item/<int:pk>/', ItemDetailView.as_view(), name='item-detail'),
     path('add_item/', AddItemView.as_view(), name='add_item'),
     path('item/edit/<int:pk>/', ItemUpdateView.as_view(), name='edit_item'),
+    path('delete-item/<int:item_id>/', DeleteItemView.as_view(), name='delete_item'),
     path('item/<int:pk>/add_image/', AddImageView.as_view(), name='add_image'),
     path('image/<int:pk>/delete/', DeleteImageView.as_view(), name='delete_image'),
     path('profile/', UserProfileView.as_view(), name='profile'),

@@ -10,6 +10,16 @@
         <p><strong>Description:</strong> {{ item.description }}</p>
         <p><strong>Status:</strong> {{ item.status }}</p>
 
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}"> <!-- Displays system messages -->
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
         {% if item_images %}
         <div class="item-images">
             {% for image in item_images %}
@@ -27,6 +37,10 @@
 
         {% if item.owner == request.user %}
         <a href="{% url 'edit_item' pk=item.pk %}">Edit this item</a> <!-- Link to edit the item if the user is the owner -->
+        <form action="{% url 'delete_item' item.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Delete this item</button>
+        </form>
         {% endif %}
     </div>
 {% endblock %}

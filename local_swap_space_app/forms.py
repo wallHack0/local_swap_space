@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, get_user_model
+from django.core.validators import RegexValidator
+
 from .models import Item, Category, ItemImage
 
 # Retrieve the current active user model used in the project.
@@ -16,9 +18,21 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 # User authentication form.
+# User authentication form.
 class CustomAuthenticationForm(AuthenticationForm):
+    latitude = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        validators=[RegexValidator(r'^-?\d{1,2}\.\d+$', message="Invalid latitude format")]
+    )
+    longitude = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        validators=[RegexValidator(r'^-?\d{1,3}\.\d+$', message="Invalid longitude format")]
+    )
+
     class Meta:
-        model = User
+        model = User  # Make sure the User model is imported or defined somewhere above
         fields = ['username', 'password']
 
 

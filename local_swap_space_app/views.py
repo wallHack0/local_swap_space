@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic.edit import FormView, UpdateView
@@ -14,7 +15,7 @@ from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, Avg, Prefetch
 from django.db import transaction
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ItemForm, RatingForm, ItemImageForm
 from .models import Item, Category, User, Like, Match, Chat, Message, Rating, ItemImage
 
@@ -24,7 +25,7 @@ class RegisterView(FormView):
        RegisterView handles user registration through a form interface using CustomUserCreationForm.
        The view renders a registration page, processes valid form submissions by saving user data
        (including optional geolocation fields), automatically logs in the new user, and redirects
-       to a success URL (typically a user dashboard).
+       to a success URL ('dashboard').
        """
     template_name = 'register.html'
     form_class = CustomUserCreationForm
@@ -46,9 +47,8 @@ class RegisterView(FormView):
                 user.latitude = float(latitude)
                 user.longitude = float(longitude)
         except ValueError:
-            # Later hand the error in better way
-            print(
-                "Incorrect data. Please ensure they are correct floating point numbers.")
+            # Later will hand the error in better way.
+            print("Incorrect latitude and longitude data.")
 
         # Save the user object to the database.
         user.save()
@@ -57,7 +57,7 @@ class RegisterView(FormView):
         login(self.request, user)
 
         # Call the parent class's form_valid method to handle redirection to success_url.
-        return super(RegisterView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class CustomLoginView(LoginView):
@@ -72,20 +72,20 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         login(self.request, form.get_user())
-        latitude = self.request.POST.get('latitude')
-        longitude = self.request.POST.get('longitude')
+
+        latitude = form.cleaned_data.get('latitude')
+        longitude = form.cleaned_data.get('longitude')
 
         try:
-            if latitude is not None and longitude is not None:
+            if latitude and longitude:
                 latitude = float(latitude)
                 longitude = float(longitude)
-
                 user = form.get_user()
                 user.latitude = latitude
                 user.longitude = longitude
                 user.save()
         except ValueError:
-            print("Niepoprawne wartości dla szerokości lub długości geograficznej.")
+            print("Wrong values for latitude and longitude.")
 
         return super().form_valid(form)
 
@@ -177,7 +177,7 @@ class AddItemView(LoginRequiredMixin, View):
         return render(request, 'add_item.html', {'item_form': item_form, 'image_form': image_form})
 
     def post(self, request, *args, **kwargs):
-        item_form = ItemForm(request.POST, request.FILES, editable_name=True)
+        item_form = ItemForm(request.POST, editable_name=True)
         image_form = ItemImageForm(request.POST, request.FILES)
         if item_form.is_valid() and image_form.is_valid():
             new_item = item_form.save(commit=False)
@@ -223,7 +223,10 @@ class ItemUpdateView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('item-detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
-        messages.success(self.request, "Przedmiot został pomyślnie zaktualizowany!")
+        """
+        Extends the base method to add a success message after the item is successfully updated.
+        """
+        messages.success(self.request, "Item has been succesfully updated!")
         return super().form_valid(form)
 
 
@@ -259,6 +262,38 @@ class DeleteImageView(LoginRequiredMixin, View):
         image.delete()
         messages.success(request, "Image deleted successfully!")  # Add a success message.
         return redirect('edit_item', pk=item_pk)
+
+
+class DeleteItemView(LoginRequiredMixin, View):
+    """
+    Allows a logged-in user to delete an item they own. If the item is part of a match,
+    informs the user about the match and prompts them to delete the match before deleting the item.
+    """
+
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get('item_id')
+        item = get_object_or_404(Item, pk=item_id)
+
+        # Check if the user owns the item.
+        if item.owner != request.user:
+            messages.error(request, "You do not have permission to delete this item.")
+            return HttpResponseRedirect(reverse('item-detail', kwargs={'pk': item_id}))
+
+        with transaction.atomic():
+            # Check if the item is part of any match.
+            if Match.objects.filter(like_one__item=item).exists() or Match.objects.filter(like_two__item=item).exists():
+                messages.warning(request,
+                                 "This item is part of a match. Please delete the match before deleting the item.")
+                return HttpResponseRedirect(reverse('item-detail', kwargs={'pk': item_id}))
+
+            # Delete all images associated with the item.
+            item.images.all().delete()
+
+            # Delete the item itself.
+            item.delete()
+
+            messages.success(request, "Item and associated images deleted successfully.")
+            return HttpResponseRedirect(reverse('dashboard'))
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
@@ -455,9 +490,19 @@ class ChatView(LoginRequiredMixin, DetailView):
         # Checks if the logged-in user is one of the participants in the chat.
         # If not, it denies access by returning an HttpResponseForbidden.
         if chat.participant_one != user and chat.participant_two != user:
-            return HttpResponseForbidden("You are not allowed to view this chat.")
+            raise PermissionDenied("You are not allowed to view this chat.")
 
         return chat
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # If the object is HttpResponseForbidden, return it directly.
+        if isinstance(self.object, HttpResponseForbidden):
+            return self.object
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -530,7 +575,7 @@ def delete_chat_and_related_data(request, chat_id):
     # Check if the current user is a participant of the chat.
     if request.user not in [chat.participant_one, chat.participant_two]:
         messages.error(request, "You do not have permission to delete this chat.")
-        return redirect('match_user_list')
+        return redirect('match_list')
 
     # Begin an atomic transaction to ensure data integrity.
     with transaction.atomic():
