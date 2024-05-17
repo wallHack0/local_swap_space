@@ -48,7 +48,7 @@ class Item(models.Model):
         ('RESERVED', 'RESERVED'),
     ]
 
-    name = models.CharField(max_length=255)  # Name of the itme
+    name = models.CharField(max_length=255)  
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)  # Foreign link to category of the item.
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Foreign link to owner of the item.
