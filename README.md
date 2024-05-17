@@ -35,6 +35,5 @@ Install additional dependencies: pip install -r requirements.txt.
 Run migrations: python manage.py migrate.
 Start the development server: python manage.py runserver.
 Navigate to http://127.0.0.1:8000/ in your web browser to access the application.
-Feedback and Contributions
-Feedback, suggestions, and contributions are welcome! Feel free to use this project for your own purposes and customize it as needed.
+Feedback, suggestions, and contributions are welcome!
 
