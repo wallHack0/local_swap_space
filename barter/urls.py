@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from local_swap_space_app.views import (RegisterView, CustomLoginView, DashboardView, ItemDetailView, AddItemView,
-                                        ItemUpdateView, DeleteItemView,AddImageView, DeleteImageView, UserProfileView,
+                                        ItemUpdateView, DeleteItemView, AddImageView, DeleteImageView, UserProfileView,
                                         OtherUserProfileView, LikedItemsView, like_item, MatchUserListView, ChatView,
                                         send_message, delete_chat_and_related_data)
 

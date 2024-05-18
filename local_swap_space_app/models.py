@@ -9,15 +9,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# User model with city and geolocation parameters.
 class User(AbstractUser):
+    """
+    Custom User model extending Django's AbstractUser to add additional fields for geolocation.
+    """
     city = models.CharField(max_length=100, blank=True, verbose_name="City")
     latitude = models.FloatField(null=True, blank=True, verbose_name="latitude")
     longitude = models.FloatField(null=True, blank=True, verbose_name="longitude")
     location = geomodels.PointField(geography=True, null=True, blank=True, verbose_name="location")
 
     def save(self, *args, **kwargs):
-        # Custom save method to automatically update the 'location' field based on latitude and longitude.
+        """
+        Custom save method to automatically update the 'location' field based on latitude and longitude.
+        It converts latitude and longitude coordinates into a Point object and updates the 'location' field.
+        """
         try:
             if self.latitude is not None and self.longitude is not None:
                 # Ensures latitude and longitude are float before creating a Point.
@@ -29,26 +34,33 @@ class User(AbstractUser):
             # Logs error if there is an issue updating the location.
             logger.error(f'Error updating location for user {self.username}: {str(e)}')
             raise
-        super().save(*args, **kwargs) # Calls the superclass' save method to handle the actual saving.
+        super().save(*args, **kwargs)  # Calls the superclass' save method to handle the actual saving.
 
 
-# Category model for items.
 class Category(models.Model):
+    """
+    Model representing a category for items.
+    """
     name = models.CharField(max_length=100)
 
     def __str__(self):
+        """
+        String representation of the category object.
+        """
         return self.name
 
 
-# Model representing an item.
 class Item(models.Model):
+    """
+    Model representing an item.
+    """
     # Choices for item availability status.
     STATUS_CHOICES = [
         ('AVAILABLE', 'AVAILABLE'),
         ('RESERVED', 'RESERVED'),
     ]
 
-    name = models.CharField(max_length=255)  # Name of the itme
+    name = models.CharField(max_length=255)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)  # Foreign link to category of the item.
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Foreign link to owner of the item.
@@ -56,33 +68,47 @@ class Item(models.Model):
                               default='AVAILABLE')
 
     def __str__(self):
+        """
+        String representation of the item object.
+        """
         return f"{self.name} ({self.status})"
 
 
-# Photos of the item.
 class ItemImage(models.Model):
+    """
+    Model representing photos of the item.
+    """
     item = models.ForeignKey(Item, related_name='images', on_delete=models.CASCADE)  # Link to the Item.
     image = models.ImageField(upload_to='item_images/')  # Path to store the image.
 
     def __str__(self):
+        """
+        String representation of the item image object.
+        """
         return f"Image for {self.item.name} (ID: {self.item.id})"
 
 
-# Model representing a 'like' on an item.
 class Like(models.Model):
+    """
+    Model representing a 'like' on an item.
+    """
     item = models.ForeignKey(Item, related_name='likes', on_delete=models.CASCADE)  # Item that is liked.
     liker = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='given_likes',
                               on_delete=models.CASCADE)  # User who liked the item.
     liked_on = models.DateTimeField(auto_now_add=True)  # Timestamp of the like.
 
     def __str__(self):
+        """
+        String representation of the like object.
+        """
         return f"{self.liker.username} liked {self.item.name}"
 
 
-# Match model between two likes.
 class Match(models.Model):
+    """
+    Model representing a match between two likes.
+    """
     # ForeignKey to the Like model for the first like involved in the match.
-    # 'related_name' allows us to access all matches where the like is the first participant.
     like_one = models.ForeignKey(Like, related_name='matches_as_one',
                                  on_delete=models.CASCADE)
     # ForeignKey to the Like model for the second like involved in the match.
@@ -91,16 +117,24 @@ class Match(models.Model):
     matched_on = models.DateTimeField(auto_now_add=True)  # Timestamp of the match.
 
     class Meta:
+        """
+        Metadata for the Match model.
+        """
         # Ensures that the combination of like_one and like_two is unique.
         # This prevents duplicate matches between the same pair of likes.
         unique_together = ('like_one', 'like_two')  # Uniqueness of the match.
 
     def __str__(self):
+        """
+        String representation of the match object.
+        """
         return f"Match: {self.like_one.item.name} and {self.like_two.item.name}"
 
 
-# Chat model between two users.
 class Chat(models.Model):
+    """
+    Model representing a chat between two users.
+    """
     # ForeignKey to the User model for the first participant of the chat.
     participant_one = models.ForeignKey(User, on_delete=models.CASCADE,
                                         related_name="chats_as_participant_one")
@@ -110,16 +144,24 @@ class Chat(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the chat was created.
 
     class Meta:
+        """
+        Metadata for the Chat model.
+        """
         # Ensures that the combination of participant_one and participant_two is unique.
         # Prevents the creation of duplicate chats between the same two users.
         unique_together = ('participant_one', 'participant_two')
 
     def __str__(self):
+        """
+        String representation of the chat object.
+        """
         return f"Chat between {self.participant_one} and {self.participant_two}"
 
 
-# Model representing a message in a chat.
 class Message(models.Model):
+    """
+    Model representing a message in a chat.
+    """
     # Foreign key to the Chat model, establishing a relationship where each message is linked to a specific chat.
     chat = models.ForeignKey(Chat, related_name='messages',
                              on_delete=models.CASCADE)
@@ -129,11 +171,16 @@ class Message(models.Model):
     sent_at = models.DateTimeField(auto_now=True)  # Timestamp when the message was sent.
 
     def __str__(self):
+        """
+        String representation of the message object.
+        """
         return f"Message from {self.sender.username} at {self.sent_at}"
 
 
-# Model representing rating between users.
 class Rating(models.Model):
+    """
+    Model representing rating between users.
+    """
     # ForeignKey linking to the user being rated.
     rated_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='received_ratings',
                                    on_delete=models.CASCADE)
@@ -148,4 +195,7 @@ class Rating(models.Model):
         unique_together = ('rated_user', 'rating_user')
 
     def __str__(self):
+        """
+        String representation of the rating object.
+        """
         return f"{self.rating_user.username} rates {self.rated_user.username} a {self.rating}"
