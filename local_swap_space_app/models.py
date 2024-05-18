@@ -82,7 +82,6 @@ class Like(models.Model):
 # Match model between two likes.
 class Match(models.Model):
     # ForeignKey to the Like model for the first like involved in the match.
-    # 'related_name' allows us to access all matches where the like is the first participant.
     like_one = models.ForeignKey(Like, related_name='matches_as_one',
                                  on_delete=models.CASCADE)
     # ForeignKey to the Like model for the second like involved in the match.
