@@ -22,16 +22,33 @@ from .models import Item, Category, User, Like, Match, Chat, Message, Rating, It
 
 class RegisterView(FormView):
     """
-       RegisterView handles user registration through a form interface using CustomUserCreationForm.
-       The view renders a registration page, processes valid form submissions by saving user data
-       (including optional geolocation fields), automatically logs in the new user, and redirects
-       to a success URL ('dashboard').
-       """
+    RegisterView handles user registration through a form interface using CustomUserCreationForm.
+    The view renders a registration page, processes valid form submissions by saving user data
+    (including optional geolocation fields), automatically logs in the new user, and redirects
+    to a success URL ('dashboard').
+
+    Attributes:
+        template_name (str): The template name used to render the registration page.
+        form_class (CustomUserCreationForm): The form class used for user registration.
+        success_url (str): The URL to redirect to upon successful form submission.
+    """
     template_name = 'register.html'
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('dashboard')
 
     def form_valid(self, form):
+        """
+        Processes the valid form submission.
+
+        Saves the form data to create a new user instance, sets additional user attributes,
+        handles optional geolocation data, logs the new user in, and redirects to the success URL.
+
+        Args:
+            form (CustomUserCreationForm): The form instance containing cleaned data.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the success URL specified in success_url.
+        """
         # Save the form data to create a new user instance, but do not commit to the database yet.
         user = form.save(commit=False)
 
@@ -62,15 +79,30 @@ class RegisterView(FormView):
 
 class CustomLoginView(LoginView):
     """
-       CustomLoginView modifies the standard Django login process by using a custom authentication form.
-       Beyond the standard user credential validation, this view also handles the storage of geolocation data
-       (latitude and longitude) if the user has allowed access to their location in the browser.
-       After successful login and optional geolocation data update, the user is redirected to the dashboard page.
-       """
+    CustomLoginView modifies the standard Django login process by using a custom authentication form.
+    Beyond the standard user credential validation, this view also handles the storage of geolocation data
+    (latitude and longitude) if the user has allowed access to their location in the browser.
+    After successful login and optional geolocation data update, the user is redirected to the dashboard page.
+
+    Attributes:
+        template_name (str): The template name used to render the login page.
+        form_class (CustomAuthenticationForm): The form class used for user authentication.
+    """
     template_name = 'login.html'
     form_class = CustomAuthenticationForm
 
     def form_valid(self, form):
+        """
+        Processes the valid form submission.
+
+        Logs in the user, updates optional geolocation data if provided, and redirects to the success URL.
+
+        Args:
+            form (CustomAuthenticationForm): The form instance containing cleaned data.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the success URL specified in get_success_url.
+        """
         login(self.request, form.get_user())
 
         latitude = form.cleaned_data.get('latitude')
@@ -90,7 +122,12 @@ class CustomLoginView(LoginView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        # Redirect to 'dashboard' after a successful login.
+        """
+        Determines the URL to redirect to after successful login.
+
+        Returns:
+            str: The URL to redirect to after a successful login, which is the 'dashboard' page.
+        """
         return reverse_lazy('dashboard')
 
 
@@ -99,12 +136,27 @@ class DashboardView(LoginRequiredMixin, ListView):
     DashboardView inherits from Django's LoginRequiredMixin to ensure that only authenticated users have access, and
     from ListView for streamlined display of items. This view enhances item listing by filtering items based on
     categories and proximity to the user's location.
+
+    Attributes:
+        model (Item): The model that this view will be displaying.
+        template_name (str): The template name used to render the dashboard page.
+        context_object_name (str): The name of the context object that will be used in the template.
     """
     model = Item
     template_name = 'dashboard.html'
     context_object_name = 'items'
 
     def get_queryset(self):
+        """
+        Retrieves the queryset of items to be displayed on the dashboard.
+
+        Filters the items based on the category and proximity to the user's location. Excludes items
+        owned by the logged-in user. If 'reset' is in the GET parameters, the filters for distance and
+        category are removed.
+
+        Returns:
+            QuerySet: The filtered and ordered queryset of items.
+        """
         # Retrieve the base queryset with related models.
         items = super().get_queryset().select_related('category', 'owner').prefetch_related('images')
         # Exclude items owned by the logged-in user.
@@ -138,8 +190,18 @@ class DashboardView(LoginRequiredMixin, ListView):
         return items
 
     def get_context_data(self, **kwargs):
+        """
+        Adds extra context to the template.
+
+        Adds all categories to the context so they can be used for filtering in the template.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            dict: The context data for the template.
+        """
         context = super().get_context_data(**kwargs)
-        # Add all categories to the context so they can be used for filtering in the template.
         context['categories'] = Category.objects.all()
         return context
 
@@ -149,12 +211,28 @@ class ItemDetailView(LoginRequiredMixin, DetailView):
     ItemDetailView provides a detailed view of a specific item, accessible only to authenticated users.
     Built on Django's DetailView, it displays detailed information about an item identified by its URL ID.
     The view extends DetailView's functionality by adding a list of item images to the context.
+
+    Attributes:
+        model (Item): The model that this view will be displaying.
+        template_name (str): The template name used to render the item detail page.
+        context_object_name (str): The name of the context object that will be used in the template.
     """
     model = Item
     template_name = 'item_detail.html'
     context_object_name = 'item'
 
     def get_context_data(self, **kwargs):
+        """
+        Adds extra context to the template.
+
+        Retrieves all images associated with the item and adds them to the context.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            dict: The context data for the template, including item images.
+        """
         context = super().get_context_data(**kwargs)
         item_images = ItemImage.objects.filter(item=self.object)  # Retrieve all associated images.
         context['item_images'] = item_images
@@ -172,11 +250,40 @@ class AddItemView(LoginRequiredMixin, View):
     """
 
     def get(self, request, *args, **kwargs):
+        """
+        Handles GET requests.
+
+        Displays the form for adding a new item and uploading images.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            HttpResponse: The rendered 'add_item.html' template with the item and image forms.
+        """
         item_form = ItemForm(editable_name=True)  # The 'name' field is editable.
         image_form = ItemImageForm()
         return render(request, 'add_item.html', {'item_form': item_form, 'image_form': image_form})
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests.
+
+        Processes the form submission for adding a new item and uploading images. If the forms are valid, the new item
+        and associated image are saved to the database. If the forms are not valid, the forms are re-rendered with
+        error messages.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the item's detail page upon successful form submission.
+            HttpResponse: The rendered 'add_item.html' template with the item and image forms if validation fails.
+        """
         item_form = ItemForm(request.POST, editable_name=True)
         image_form = ItemImageForm(request.POST, request.FILES)
         if item_form.is_valid() and image_form.is_valid():
@@ -195,6 +302,12 @@ class ItemUpdateView(LoginRequiredMixin, UpdateView):
     """
     ItemUpdateView handles the process of updating an existing item. It ensures that only authenticated users can update
     items using LoginRequiredMixin. This view utilizes Django's built-in UpdateView for handling form submissions.
+
+    Attributes:
+        model (Item): The model that this view will be updating.
+        form_class (ItemForm): The form class used to update the item.
+        template_name (str): The template name used to render the edit item page.
+        context_object_name (str): The name of the context object that will be used in the template.
     """
     model = Item
     form_class = ItemForm
@@ -205,6 +318,12 @@ class ItemUpdateView(LoginRequiredMixin, UpdateView):
         """
         Extends the base implementation to add item images to the context, allowing them to be displayed and potentially
         updated along with other item details.
+
+        Args:
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            dict: The context data for the template, including item images.
         """
         context = super().get_context_data(**kwargs)
         context['item_images'] = ItemImage.objects.filter(item=self.object)  # Add associated images to the context.
@@ -214,17 +333,32 @@ class ItemUpdateView(LoginRequiredMixin, UpdateView):
         """
         Extends the base implementation to modify the form kwargs based on view-specific requirements. Here, it sets
         'editable_name' to 'False' to prevent editing the item's name.
+
+        Returns:
+            dict: The keyword arguments for instantiating the form.
         """
         kwargs = super().get_form_kwargs()
         kwargs['editable_name'] = False  # Disallow editing of the item's name through the form.
         return kwargs
 
     def get_success_url(self):
+        """
+        Determines the URL to redirect to after a successful form submission.
+
+        Returns:
+            str: The URL to redirect to after a successful item update, which is the item's detail page.
+        """
         return reverse_lazy('item-detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
         """
         Extends the base method to add a success message after the item is successfully updated.
+
+        Args:
+            form (ItemForm): The form instance containing cleaned data.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the success URL specified in get_success_url.
         """
         messages.success(self.request, "Item has been succesfully updated!")
         return super().form_valid(form)
@@ -239,6 +373,22 @@ class AddImageView(LoginRequiredMixin, View):
     """
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for uploading images to a specific item.
+
+        Retrieves the item based on the primary key provided in the URL. If an image file is included in the request,
+        it creates a new ItemImage instance and associates it with the item. On successful upload, the user is redirected
+        back to the item edit page with a success message. If no image is provided, an error message is shown and the user
+        is redirected back to the item edit page.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments containing the primary key of the item.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the item edit page with a success or error message.
+        """
         item = Item.objects.get(pk=kwargs['pk'])
         if 'image' in request.FILES:
             new_image = ItemImage(item=item, image=request.FILES['image'])  # Create a new ItemImage instance.
@@ -257,6 +407,20 @@ class DeleteImageView(LoginRequiredMixin, View):
     """
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests for deleting a specific image associated with an item.
+
+        Retrieves the image based on the primary key provided in the URL. Deletes the image from the database, and
+        redirects the user back to the item edit page with a success message.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments containing the primary key of the image to be deleted.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the item edit page with a success message.
+        """
         image = ItemImage.objects.get(pk=kwargs['pk'])  # Getting an image.
         item_pk = image.item.pk
         image.delete()
@@ -266,11 +430,30 @@ class DeleteImageView(LoginRequiredMixin, View):
 
 class DeleteItemView(LoginRequiredMixin, View):
     """
-    Allows a logged-in user to delete an item they own. If the item is part of a match,
+    DeleteItemView allows a logged-in user to delete an item they own. If the item is part of a match,
     informs the user about the match and prompts them to delete the match before deleting the item.
     """
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests to delete a specific item owned by the user.
+
+        Retrieves the item based on the primary key provided in the URL. Checks if the user owns the item,
+        and if the item is part of any match. If the item is part of a match, a warning message is shown and
+        the user is redirected back to the item detail page. If the user does not own the item, an error message
+        is shown. If the item can be deleted, all associated images are deleted first, followed by the item itself.
+        A success message is then shown, and the user is redirected to the dashboard.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments containing the primary key of the item to be deleted.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the item detail page with a warning message if the item is part of a match.
+            HttpResponseRedirect: Redirects to the item detail page with an error message if the user does not own the item.
+            HttpResponseRedirect: Redirects to the dashboard with a success message if the item is successfully deleted.
+        """
         item_id = kwargs.get('item_id')
         item = get_object_or_404(Item, pk=item_id)
 
@@ -301,10 +484,25 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     UserProfileView provides a detailed profile page for a user. This view is only accessible to authenticated users.
     It displays detailed information about the user, including their listed items and
     average rating received from other users.
+
+    Attributes:
+        template_name (str): The template name used to render the user profile page.
     """
     template_name = 'profile.html'
 
     def get_context_data(self, **kwargs):
+        """
+        Retrieves the necessary data to populate the user profile page.
+
+        Fetches the current user from the request and adds it to the context. Retrieves the items listed by the user
+        and adds them to the context. Calculates the average rating received by the user and adds it to the context.
+
+        Args:
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            dict: The context data for rendering the template.
+        """
         context = super().get_context_data(**kwargs)
         user = self.request.user  # Fetch the user from the request.
         context['profile_user'] = user  # Add the user to the context.
@@ -340,6 +538,12 @@ class OtherUserProfileView(LoginRequiredMixin, DetailView):
         """
         Extends the base implementation to include items owned by the user, check for existing ratings,
         determine if the current user can rate the profile user, and include a form for rating if applicable.
+
+        Args:
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            dict: The context data for rendering the template.
         """
         context = super().get_context_data(**kwargs)
         other_user = context['profile_user']
@@ -370,6 +574,15 @@ class OtherUserProfileView(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         """
         Handles POST requests to rate the profile user. Validates the form and updates or creates the rating.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            HttpResponseRedirect: Redirects to the other user profile page with a success message upon successful rating submission.
+            HttpResponseRedirect: Redirects to the other user profile page with an error message if there was an error with the submission.
         """
         self.object = self.get_object()  # Retrieve the user object from the URL.
         context = self.get_context_data(object=self.object)
@@ -397,18 +610,40 @@ class LikedItemsView(LoginRequiredMixin, ListView):
     LikedItemsView displays a list of items that the currently logged-in user has liked.
     This view leverages LoginRequiredMixin to ensure only authenticated users can access the list of liked items.
     The view uses Django's ListView for displaying a list based on a Django model.
+
+    Attributes:
+        model (Model): Django model to query for this view, here it is Like.
+        template_name (str): Path to the HTML template used for rendering the liked items list.
+        context_object_name (str): Name of the context variable used in the template to represent the list of likes.
     """
     model = Like
     template_name = 'liked_items.html'
     context_object_name = 'likes'
 
     def get_queryset(self):
+        """
+        Retrieves the queryset of liked items by the currently logged-in user.
+
+        Returns:
+            queryset: Queryset of liked items by the currently logged-in user, ordered by most recent.
+        """
         # Retrieves likes by the logged-in user, ordered by most recent.
         return Like.objects.filter(liker=self.request.user).prefetch_related(
             Prefetch('item__images', queryset=ItemImage.objects.order_by('id'))  # Ensures images are prefetched.
         ).order_by('-liked_on')
 
     def get_context_data(self, **kwargs):
+        """
+        Retrieves additional context data for the liked items list view.
+
+        Adds items owned by the logged-in user that have received likes to the context.
+
+        Args:
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            dict: The context data for rendering the template.
+        """
         context = super().get_context_data(**kwargs)
         # Add items owned by the logged-in user that have received likes.
         context['my_items'] = Item.objects.filter(owner=self.request.user).prefetch_related('likes')
@@ -421,6 +656,11 @@ class MatchUserListView(LoginRequiredMixin, ListView):
     It inherits from ListView and requires user authentication provided by LoginRequiredMixin.
     This view is specifically designed to manage and display user matches which could potentially lead to further
     message sending.
+
+    Attributes:
+        model (Model): Django model to query for this view, here it is Match.
+        template_name (str): Path to the HTML template used for rendering the matched user list.
+        context_object_name (str): Name of the context variable used in the template to represent the list of matches.
     """
 
     model = Match
@@ -429,12 +669,16 @@ class MatchUserListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """
+        Retrieves the queryset of matches involving the current user and prepares them for rendering.
+
         Overrides the default queryset to retrieve matches that involve the current user either as like_one or like_two
         participant in the match. It then groups these matches by the other participant to simplify the rendering
         logic in the template. The grouping process also involves creation of a chat session for each
         unique pair of matched users if it does not already exist.
-        """
 
+        Returns:
+            list: List of dictionaries representing the matches and related data for rendering in the template.
+        """
         user = self.request.user
         # Retrieve all matches where the current user is either like_one or like_two participant.
         # The 'distinct()' ensures that each match is unique, avoiding duplicates in the list.
@@ -476,12 +720,25 @@ class ChatView(LoginRequiredMixin, DetailView):
     """
     Provides a detailed view for a specific chat session. This view ensures that only participants of the chat
     can view its details and messages, securing privacy and relevancy to the involved users.
+
+    Attributes:
+        model (Model): Django model to query for this view, here it is Chat.
+        context_object_name (str): Name of the context variable used in the template to represent the chat object.
+        template_name (str): Path to the HTML template used for rendering the chat details.
     """
     model = Chat
     context_object_name = 'chat'
     template_name = 'chat_detail.html'
 
     def get_object(self, *args, **kwargs):
+        """
+        Retrieves the chat object based on the primary key provided in the URL and checks user participation.
+
+        Overrides the base implementation to ensure that only participants of the chat can view its details and messages.
+
+        Returns:
+            Chat: The chat object if the logged-in user is a participant, else raises PermissionDenied.
+        """
         # Retrieve the default chat object based on the primary key provided in the URL.
         chat = super().get_object(*args, **kwargs)
         user = self.request.user
@@ -494,6 +751,12 @@ class ChatView(LoginRequiredMixin, DetailView):
         return chat
 
     def get(self, request, *args, **kwargs):
+        """
+        Handles GET requests and ensures user participation in the chat.
+
+        Returns:
+            HttpResponse: The response with chat details and messages or Forbidden if user is not a participant.
+        """
         self.object = self.get_object()
 
         # If the object is HttpResponseForbidden, return it directly.
@@ -504,6 +767,12 @@ class ChatView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
+        """
+        Retrieves additional context data for the chat view, including associated messages.
+
+        Returns:
+            dict: The context data for rendering the template.
+        """
         context = super().get_context_data(**kwargs)
         chat = context['chat']
         # Fetch all messages associated with this chat, ordered by the time they were sent.
@@ -518,8 +787,16 @@ class ChatView(LoginRequiredMixin, DetailView):
 def send_message(request, chat_id):
     """
     Handles the posting of a message to a specific chat identified by chat_id.
+
     This function checks if the user is authenticated and that the request is a POST.
     If the message text is not empty, it creates a new message associated with the chat.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        chat_id (int): The ID of the chat to which the message is being sent.
+
+    Returns:
+        HttpResponseRedirect: Redirects the user to the chat detail page after sending the message.
     """
     # Retrieve the chat object; return 404 if not found.
     chat = get_object_or_404(Chat, id=chat_id)
@@ -539,8 +816,17 @@ def send_message(request, chat_id):
 @require_POST  # Restricts this function to handle only POST requests to ensure data is submitted securely.
 def like_item(request, item_id):
     """
-    Allows a user to like an item. The function ensures that each like is unique per user and item.
+    Allows a user to like an item.
+
+    The function ensures that each like is unique per user and item.
     If a user tries to like an item they have already liked, the function will not create a duplicate like.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        item_id (int): The ID of the item to be liked.
+
+    Returns:
+        HttpResponseRedirect: Redirects the user to the dashboard after liking the item.
     """
     # Retrieve the item by ID, returning a 404 error if not found.
     item = get_object_or_404(Item, pk=item_id)
@@ -567,6 +853,13 @@ def delete_chat_and_related_data(request, chat_id):
     """
     Deletes a specific chat and all related data, including messages, likes, and matches,
     ensuring that the user has the right to delete the chat.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        chat_id (int): The ID of the chat to be deleted.
+
+    Returns:
+        HttpResponseRedirect: Redirects the user to the match list page after successfully deleting the chat.
     """
     # Retrieves the chat object; returns a 404 error if not found.
     chat = get_object_or_404(Chat, pk=chat_id)
