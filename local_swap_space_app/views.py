@@ -453,17 +453,17 @@ class MatchUserListView(LoginRequiredMixin, ListView):
             item_from_user = match.like_one.item if match.like_one.liker == user else match.like_two.item
             item_from_them = match.like_two.item if match.like_one.liker == user else match.like_one.item
 
-            # Create a unique pair key based on user IDs to prevent duplicate chat sessions
+            # Create a unique pair key based on user IDs to prevent duplicate chat sessions.
             user_pair_key = (min(user.id, other_user.id), max(user.id, other_user.id))
 
-            # Check if a chat session exists for this user pair; create one if it doesn't exist
+            # Check if a chat session exists for this user pair; create one if it doesn't exist.
             if grouped_matches[other_user]['chat'] is None:
                 grouped_matches[other_user]['chat'], _ = Chat.objects.get_or_create(
                     participant_one=User.objects.get(id=user_pair_key[0]),
                     participant_two=User.objects.get(id=user_pair_key[1])
                 )
 
-            # Add items to the respective sets in the grouped data structure
+            # Add items to the respective sets in the grouped data structure.
             grouped_matches[other_user]['items_from_user'].add(item_from_user)
             grouped_matches[other_user]['items_from_them'].add(item_from_them)
 
