@@ -467,7 +467,7 @@ class MatchUserListView(LoginRequiredMixin, ListView):
             grouped_matches[other_user]['items_from_user'].add(item_from_user)
             grouped_matches[other_user]['items_from_them'].add(item_from_them)
 
-        # Return a list of dictionaries for easier template rendering,
+        # Return a list of dictionaries for easier template rendering.
         # each dictionary represents a unique match with combined info.
         return [{'other_user': key, **value} for key, value in grouped_matches.items()]
 
