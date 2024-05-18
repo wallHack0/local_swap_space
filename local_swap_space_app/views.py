@@ -435,7 +435,6 @@ class MatchUserListView(LoginRequiredMixin, ListView):
         unique pair of matched users if it does not already exist.
         """
 
-        # Fetch the current logged-in user from the request.
         user = self.request.user
         # Retrieve all matches where the current user is either like_one or like_two participant.
         # The 'distinct()' ensures that each match is unique, avoiding duplicates in the list.
