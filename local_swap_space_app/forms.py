@@ -8,8 +8,10 @@ from .models import Item, Category, ItemImage
 User = get_user_model()
 
 
-# Form for creating a new user.
 class CustomUserCreationForm(UserCreationForm):
+    """
+    Form for creating a new user.
+    """
     city = forms.CharField()
 
     class Meta:
@@ -17,8 +19,10 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2', 'city']
 
 
-# User authentication form.
 class CustomAuthenticationForm(AuthenticationForm):
+    """
+    Custom authentication form.
+    """
     latitude = forms.CharField(
         required=False,
         widget=forms.HiddenInput(),
@@ -35,13 +39,19 @@ class CustomAuthenticationForm(AuthenticationForm):
         fields = ['username', 'password']
 
 
-# Form for creating and editing items.
 class ItemForm(forms.ModelForm):
+    """
+    Form for creating and editing items.
+    """
+
     class Meta:
         model = Item
         fields = ['name', 'description', 'category', 'status']
 
     def __init__(self, *args, **kwargs):
+        """
+        Custom initialization method to handle form initialization.
+        """
         editable_name = kwargs.pop('editable_name', True)  # Determines whether the 'name' field should be editable.
         super(ItemForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.all()  # Sets queryset for category field.
@@ -49,14 +59,19 @@ class ItemForm(forms.ModelForm):
             self.fields['name'].disabled = True  # Disable 'name' field if it is not editable.
 
 
-# Form for rating items.
 class RatingForm(forms.Form):
+    """
+    Form for rating items.
+    """
     rating = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 6)],
                                widget=forms.RadioSelect)  # Rating options from 1 to 5.
 
 
-# Form for adding item images.
 class ItemImageForm(forms.ModelForm):
+    """
+    Form for adding item images.
+    """
+
     class Meta:
         model = ItemImage
         fields = ['image']
