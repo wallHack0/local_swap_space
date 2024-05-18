@@ -31,7 +31,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     )
 
     class Meta:
-        model = User  # Make sure the User model is imported or defined somewhere above
+        model = User
         fields = ['username', 'password']
 
 
