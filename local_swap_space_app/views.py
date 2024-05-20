@@ -16,7 +16,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, Avg, Prefetch
 from django.db import transaction
 from django.http import HttpResponseForbidden, HttpResponseRedirect
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, ItemForm, RatingForm, ItemImageForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, ItemForm, RatingForm, ItemImageForm, \
+    CustomUserChangeForm
 from .models import Item, Category, User, Like, Match, Chat, Message, Rating, ItemImage
 
 
@@ -512,6 +513,31 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         average_rating = Rating.objects.filter(rated_user=user).aggregate(Avg('rating'))['rating__avg']
         context['average_rating'] = average_rating if average_rating is not None else "No ratings"
         return context
+
+
+class EditUserProfileView(LoginRequiredMixin, UpdateView):
+    """
+    UserProfileEditView allows authenticated users to edit their profile information.
+
+    Attributes:
+        model (User): The user model used for the form.
+        form_class (CustomUserChangeForm): The form class used for updating user profile information.
+        template_name (str): The template name used to render the edit profile page.
+        success_url (str): The URL to redirect to after a successful form submission.
+    """
+    model = User
+    form_class = CustomUserChangeForm
+    template_name = 'edit_profile.html'
+    success_url = reverse_lazy('profile')
+
+    def get_object(self, **kwargs):
+        """
+        Overrides the get_object method to return the currently authenticated user.
+
+        Returns:
+            User: The currently authenticated user.
+        """
+        return self.request.user
 
 
 class OtherUserProfileView(LoginRequiredMixin, DetailView):

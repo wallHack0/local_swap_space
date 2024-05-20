@@ -21,8 +21,8 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path
 from local_swap_space_app.views import (RegisterView, CustomLoginView, DashboardView, ItemDetailView, AddItemView,
                                         ItemUpdateView, DeleteItemView, AddImageView, DeleteImageView, UserProfileView,
-                                        OtherUserProfileView, LikedItemsView, like_item, MatchUserListView, ChatView,
-                                        send_message, delete_chat_and_related_data)
+                                        EditUserProfileView, OtherUserProfileView, LikedItemsView, like_item,
+                                        MatchUserListView, ChatView, send_message, delete_chat_and_related_data)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +37,7 @@ urlpatterns = [
     path('item/<int:pk>/add_image/', AddImageView.as_view(), name='add_image'),
     path('image/<int:pk>/delete/', DeleteImageView.as_view(), name='delete_image'),
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('profile/edit/', EditUserProfileView.as_view(), name='edit_profile'),
     path('user/<str:username>/', OtherUserProfileView.as_view(), name='other-user-profile'),
     path('liked_items/', LikedItemsView.as_view(), name='liked_items'),
     path('like-item/<int:item_id>/', like_item, name='like-item'),

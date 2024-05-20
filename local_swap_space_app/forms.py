@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, get_user_model
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, get_user_model, UserChangeForm
 from django.core.validators import RegexValidator
 
 from .models import Item, Category, ItemImage
@@ -37,6 +37,17 @@ class CustomAuthenticationForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ['username', 'password']
+
+
+class CustomUserChangeForm(UserChangeForm):
+    """
+    Form for editing user profile information.
+    """
+    password = None  # Hide the password field in the form.
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'city']
 
 
 class ItemForm(forms.ModelForm):
