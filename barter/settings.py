@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rf5mlrc_ge5c#otb9zjhmzej1tjd+r+dv5o$+)p2a=t8$lch*4'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Application definition
 
@@ -37,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'local_swap_space_app.apps.LocalSwapSpaceAppConfig',
+    'leaflet',
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [
@@ -82,20 +86,20 @@ WSGI_APPLICATION = 'barter.wsgi.application'
 
 DATABASES = {
     'default': {
-        'HOST': '127.0.0.1',
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'swap_space_local_db',
-        'USER': 'postgres',
-        'PASSWORD': 'coderslab',
-        'PORT': '5432',
+        'ENGINE': config('DB_DEFAULT_ENGINE'),
+        'NAME': config('DB_DEFAULT_NAME'),
+        'USER': config('DB_DEFAULT_USER'),
+        'PASSWORD': config('DB_DEFAULT_PASSWORD'),
+        'HOST': config('DB_DEFAULT_HOST'),
+        'PORT': config('DB_DEFAULT_PORT', default='5432'),
     },
     'test': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_swap_space_local_db',
-        'USER': 'postgres',
-        'PASSWORD': 'coderslab',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': config('DB_TEST_ENGINE'),
+        'NAME': config('DB_TEST_NAME'),
+        'USER': config('DB_TEST_USER'),
+        'PASSWORD': config('DB_TEST_PASSWORD'),
+        'HOST': config('DB_TEST_HOST'),
+        'PORT': config('DB_TEST_PORT', default='5432'),
     }
 }
 
@@ -146,3 +150,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so'
 
 LOGIN_URL = '/login/'
+
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (0, 0),
+    'DEFAULT_ZOOM': 2,
+    'MIN_ZOOM': 1,
+    'MAX_ZOOM': 18,
+    'SCALE': 'metric',
+}
