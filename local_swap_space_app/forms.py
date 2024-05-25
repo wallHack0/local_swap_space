@@ -12,7 +12,17 @@ class CustomUserCreationForm(UserCreationForm):
     """
     Form for creating a new user.
     """
-    city = forms.CharField()
+    city = forms.ChoiceField(choices=User.POLISH_CAPITALS, required=False)
+    latitude = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        validators=[RegexValidator(r'^-?\d{1,2}\.\d+$', message="Invalid latitude format")]
+    )
+    longitude = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        validators=[RegexValidator(r'^-?\d{1,3}\.\d+$', message="Invalid longitude format")]
+    )
 
     class Meta:
         model = User

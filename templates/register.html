@@ -2,17 +2,34 @@
 {% load static %}
 
 {% block content %}
-<h2>Register</h2>
+<div class="container my-4">
+    <section class="hero text-center">
+        <h1>Welcome to Local Swap Space</h1>
+        <p>Discover, connect, and swap items with people in your local community.</p>
+    </section>
 
-<!-- Page description -->
-<p>Welcome to LocalSwapSpace! Join our community where you can swap items locally. For the safest and most effective experience, we recommend that exchanges be made in person whenever possible.</p>
+    <section class="register">
+        <h2>Register</h2>
+        <p>Welcome to LocalSwapSpace! Join our community where you can swap items locally. For the safest and most effective experience, we recommend that exchanges be made in person whenever possible.</p>
 
-<!-- Registration form -->
-<form method="post" id="registrationForm">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button> 
-</form>
+        <form method="post" id="registrationForm" class="form-signin">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+    </section>
+
+    <section class="features row text-center">
+        <div class="feature-item col-md-6">
+            <h3>Easy to Use</h3>
+            <p>Our platform is designed to be user-friendly and intuitive.</p>
+        </div>
+        <div class="feature-item col-md-6">
+            <h3>Local Connections</h3>
+            <p>Connect with people in your area and swap items locally.</p>
+        </div>
+    </section>
     
-<script src="{% static 'js/geolocation.js' %}"></script>
+    <script src="{% static 'js/geolocation.js' %}"></script>
+</div>
 {% endblock %}

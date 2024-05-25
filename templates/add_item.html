@@ -1,11 +1,19 @@
 {% extends 'base.html' %}
 
+{% block title %}Add New Item{% endblock %}
+
 {% block content %}
-<h2>Add New Item</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ item_form.as_p }}
-    {{ image_form.as_p }}
-    <button type="submit" class="btn btn-success">Add Item</button>
-</form>
+<div class="container my-4">
+    <h2 class="mb-4">Add New Item</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ item_form.as_p }}
+        </div>
+        <div class="form-group">
+            {{ image_form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-success">Add Item</button>
+    </form>
+</div>
 {% endblock %}

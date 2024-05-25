@@ -13,7 +13,29 @@ class User(AbstractUser):
     """
     Custom User model extending Django's AbstractUser to add additional fields for geolocation.
     """
-    city = models.CharField(max_length=100, blank=True, verbose_name="City")
+    POLISH_CAPITALS = [
+        ('', '---'),
+        ("Warszawa", "Warszawa"),
+        ("Kraków", "Kraków"),
+        ("Łódź", "Łódź"),
+        ("Wrocław", "Wrocław"),
+        ("Poznań", "Poznań"),
+        ("Gdańsk", "Gdańsk"),
+        ("Szczecin", "Szczecin"),
+        ("Bydgoszcz", "Bydgoszcz"),
+        ("Lublin", "Lublin"),
+        ("Białystok", "Białystok"),
+        ("Katowice", "Katowice"),
+        ("Gdynia", "Gdynia"),
+        ("Częstochowa", "Częstochowa"),
+        ("Radom", "Radom"),
+        ("Sosnowiec", "Sosnowiec"),
+        ("Toruń", "Toruń"),
+        ("Kielce", "Kielce"),
+        ("Rzeszów", "Rzeszów"),
+    ]
+
+    city = models.CharField(max_length=100, blank=True, verbose_name="City", choices=POLISH_CAPITALS)
     latitude = models.FloatField(null=True, blank=True, verbose_name="latitude")
     longitude = models.FloatField(null=True, blank=True, verbose_name="longitude")
     location = geomodels.PointField(geography=True, null=True, blank=True, verbose_name="location")

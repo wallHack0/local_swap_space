@@ -3,38 +3,49 @@
 {% block title %}Edit Item{% endblock %}
 
 {% block content %}
+<div class="container my-4">
     {% if messages %}
-        <div class="messages">
+        <div class="alert alert-info">
             {% for message in messages %}
-                <div class="{{ message.tags }}"> <!-- Display system messages -->
-                    {{ message }}
-                </div>
+                <div class="{{ message.tags }}">{{ message }}</div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <h2>Edit Item</h2>
-    <h3>{{ item.name }}</h3> <!-- Display the name of the item being edited -->
+    <h2>{{ item.name }}</h2>
 
-    <form method="post" enctype="multipart/form-data"> <!-- Form for submitting item updates -->
+    <form method="post" enctype="multipart/form-data" class="mb-4">
         {% csrf_token %}
-        {{ form.as_p }} <!-- Render the item form fields as paragraphs -->
-        <button type="submit">Update</button>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update</button>
     </form>
 
-    <h4>Current Images</h4> <!-- Heading for current images section -->
-    {% for image in item_images %}
-        <div>
-            <img src="{{ image.image.url }}" alt="Image" style="width: 100px; height: auto;"> <!-- Display each current image -->
-            <a href="{% url 'delete_image' image.id %}">Delete</a> <!-- Link to delete an image -->
+    
+        <div class="row justify-content-lg-center">
+            {% for image in item_images %}
+            <div class="col-md-3 mb-3">
+                <div>
+                    <div class="ml-3">
+                        <img src="{{ image.image.url }}" alt="Image" class="card-img">
+                    </div>
+                    <div class="card-body text-center">
+                        <a href="{% url 'delete_image' image.id %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+    
 
-    <h4>Add New Image</h4> <!-- Heading for adding new images -->
-    <form method="post" action="{% url 'add_image' item.id %}" enctype="multipart/form-data"> <!-- Form to add new images -->
-        {% csrf_token %}
-        <input type="file" name="image">
-        <button type="submit">Add Image</button>
-    </form>
-
+    <div class="add-image-section">
+        <h3>Add New Image</h3>
+        <form method="post" action="{% url 'add_image' item.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="file" name="image" class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-success">Add Image</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

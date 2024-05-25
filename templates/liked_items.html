@@ -1,54 +1,52 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
 {% block title %}My Likes{% endblock %}
 
 {% block content %}
-<h1>My Liked Items</h1>
-<ul>
-    {% for like in likes %}
-    <li>
-        {% if like.item.images.all %}
-            <!-- Link to the detail view of the liked item with its first image displayed -->
-            <a href="{% url 'item-detail' pk=like.item.pk %}">
-                <img src="{{ like.item.images.all.0.image.url }}" alt="Image of {{ like.item.name }}" style="width: 100px; height: auto;">
-            </a>
-        {% endif %}
-        {% if like.item and like.item.pk %}
-            <!-- Display the name of the liked item with a timestamp -->
-            <a href="{% url 'item-detail' pk=like.item.pk %}">{{ like.item.name }}</a> - Liked on: {{ like.liked_on|date:"Y-m-d H:i" }}
-        {% else %}
-            <!-- Display a message if the item is no longer available -->
-            Item no longer available - Liked on: {{ like.liked_on|date:"Y-m-d H:i" }}
-        {% endif %}
-    </li>
-    {% empty %}
-    <p>You have not liked any items yet.</p>
-    {% endfor %}
-</ul>
+<div class="container my-4">
+    <h1 class="mb-4">My Liked Items</h1>
+    <ul class="list-group">
+        {% for like in likes %}
+            <li class="list-group-item">
+                {% if like.item.images.all %}
+                    <a href="{% url 'item-detail' pk=like.item.pk %}">
+                        <img src="{{ like.item.images.all.0.image.url }}" alt="Image of {{ like.item.name }}" class="img-thumbnail" style="width: 100px; height: auto;">
+                    </a>
+                {% endif %}
+                {% if like.item and like.item.pk %}
+                    <a href="{% url 'item-detail' pk=like.item.pk %}">{{ like.item.name }}</a> - Liked on: {{ like.liked_on|date:"Y-m-d H:i" }}
+                {% else %}
+                    Item no longer available - Liked on: {{ like.liked_on|date:"Y-m-d H:i" }}
+                {% endif %}
+            </li>
+        {% empty %}
+            <li class="list-group-item">You have not liked any items yet.</li>
+        {% endfor %}
+    </ul>
 
-<h2>My Items Liked by Others</h2>
-<ul>
-    {% for item in my_items %}
-        <li>
-            {% if item.images.first %}
-                <!-- Link to the detail view of the user's item with its first image displayed -->
-                <a href="{% url 'item-detail' pk=item.pk %}">
-                    <img src="{{ item.images.first.image.url }}" alt="Image of {{ item.name }}" style="width: 100px; height: auto;">
-                </a>
-            {% endif %}
-            <!-- Display the name of the user's item and count of likes received -->
-            <a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a> - likes received:
-            <ul>
-                {% for like in item.likes.all %}
-                    <!-- Display each liker's username with a link to their profile and the time they liked the item -->
-                    <li><a href="{% url 'other-user-profile' username=like.liker.username %}">{{ like.liker.username }}</a> - Liked on: {{ like.liked_on|date:"Y-m-d H:i" }}</li>
-                {% empty %}
-                    <li>No likes yet.</li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% empty %}
-        <li>You have no items liked by others yet.</li>
-    {% endfor %}
-</ul>
+    <h2 class="mt-5 mb-4">My Items Liked by Others</h2>
+    <ul class="list-group">
+        {% for item in my_items %}
+            <li class="list-group-item">
+                {% if item.images.first %}
+                    <a href="{% url 'item-detail' pk=item.pk %}">
+                        <img src="{{ item.images.first.image.url }}" alt="Image of {{ item.name }}" class="img-thumbnail" style="width: 100px; height: auto;">
+                    </a>
+                {% endif %}
+                <a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a> - likes received:
+                <ul class="list-group mt-2">
+                    {% for like in item.likes.all %}
+                        <li class="list-group-item">
+                            <a href="{% url 'other-user-profile' username=like.liker.username %}">{{ like.liker.username }}</a> - Liked on: {{ like.liked_on|date:"Y-m-d H:i" }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">No likes yet.</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% empty %}
+            <li class="list-group-item">You have no items liked by others yet.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

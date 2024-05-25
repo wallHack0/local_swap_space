@@ -1,11 +1,24 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
 
 {% block content %}
-  <h2>Edit Profile</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save changes</button>
-  </form>
-  <a href="{% url 'profile' %}">Cancel</a>
+<div class="container my-4">
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                <div class="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2>Edit Profile</h2>
+    <h3>{{ user.username }}</h3>
+
+    <form method="post" enctype="multipart/form-data" class="text-left">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
 {% endblock %}

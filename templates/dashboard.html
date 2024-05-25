@@ -1,60 +1,71 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}
-    Dashboard - {{ request.user.username }} <!-- Dynamically set the page title using the username -->
+    Dashboard - {{ request.user.username }}
 {% endblock %}
 
 {% block content %}
-    <h1>Dashboard</h1>
 
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
-                <div class="{{ message.tags }}"> <!-- Displays system messages -->
+                <div class="alert alert-{{ message.tags }}">
                     {{ message }}
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <div>
-        <h2>Items to Explore</h2> <!-- Subheading for the item exploration section -->
-        <form method="GET" class="filter-form">
-            <label for="category">Filter by Category:</label> <!-- Category filter -->
-            <select id="category" name="category" onchange="this.form.submit();">
-                <option value="">All Categories</option> <!-- Default selection for all categories -->
+    <form id="update-location-form" method="post" action="{% url 'update_location' %}" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+        <button type="button" id="update-location-btn" class="btn btn-primary">Update Location</button>
+    </form>
+    
+    <form method="GET" class="form-inline mb-4">
+        <div class="form-group mr-2">
+            <label for="category" class="mr-2">Filter by Category:</label>
+            <select id="category" name="category" class="form-control" onchange="this.form.submit();">
+                <option value="">All Categories</option>
                 {% for category in categories %}
                     <option value="{{ category.id }}" {% if category.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
-                        {{ category.name }} <!-- Option for each category -->
+                        {{ category.name }}
                     </option>
                 {% endfor %}
             </select>
+        </div>
+        <div class="form-group mr-2">
+            <label for="distance" class="mr-2">Max distance (km):</label>
+            <input type="number" id="distance" name="distance" class="form-control" value="{{ request.GET.distance }}" placeholder="Enter max distance">
+        </div>
+        <button type="submit" class="btn btn-secondary mr-2">Filter</button>
+        <button type="submit" name="reset" value="1" class="btn btn-warning">Reset Filters</button>
+    </form>
 
-            <label for="distance">Max distance (km):</label> <!-- Input for filtering by maximum distance -->
-            <input type="number" id="distance" name="distance" value="{{ request.GET.distance }}" placeholder="Enter max distance">
-
-            <button type="submit">Filter</button>
-            <button type="submit" name="reset" value="1">Reset Filters</button> <!-- Button to reset filters -->
-        </form>
-
-        <ul id="items-list">
-            {% for item in items %}
-                <li>
-                    <strong><a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a></strong> - {{ item.description }} <!-- Item name and description with a link to its detail page -->
-                    {% for image in item.images.all %}
-                        <a href="{% url 'item-detail' pk=item.pk %}"><img src="{{ image.image.url }}" alt="{{ item.name }}" style="width:100px; height:auto;"></a> <!-- Display all images associated with the item -->
-                    {% endfor %}
-                    
-                    <p>Distance: {{ item.distance.km|floatformat:2 }} km</p> <!-- Display the distance to the item -->
-                    
+    <ul id="items-list" class="list-group">
+        {% for item in items %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong><a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a></strong> - {{ item.description }}
+                        {% for image in item.images.all %}
+                            <a href="{% url 'item-detail' pk=item.pk %}">
+                                <img src="{{ image.image.url }}" alt="{{ item.name }}" class="img-thumbnail" style="width:100px; height:auto;">
+                            </a>
+                        {% endfor %}
+                        <p>Distance: {{ item.distance.km|floatformat:2 }} km</p>
+                    </div>
                     <form action="{% url 'like-item' item.id %}" method="post">
                         {% csrf_token %}
-                        <button type="submit">Like</button> <!-- Button to like an item -->
+                        <button type="submit" class="btn btn-success">Like</button>
                     </form>
-                </li>
-                {% empty %}
-                <li>No items available.</li>
-            {% endfor %}
-        </ul>
-    </div>
+                </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No items available.</li>
+        {% endfor %}
+    </ul>
+
+    <script src="{% static 'js/update_location.js' %}" defer></script>
 {% endblock %}

@@ -4,7 +4,43 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bd78b46d-7686-4259-b9d1-dd5d2d99568d" name="Changes" comment="" />
+    <list default="true" id="bd78b46d-7686-4259-b9d1-dd5d2d99568d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/local_swap_space_app/static/css/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/local_swap_space_app/static/js/update_location.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/contact.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/barter/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/barter/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/barter/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/barter/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/local_swap_space_app/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0002_user_city.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0003_rating.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0004_itemimage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0005_user_latitude_user_longitude.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0006_user_location.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0007_remove_user_location.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0008_user_location.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/migrations/0009_alter_user_latitude_alter_user_location_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/local_swap_space_app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/local_swap_space_app/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local_swap_space_app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/local_swap_space_app/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/add_item.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/add_item.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/chat_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/chat_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/edit_item.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/edit_item.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/edit_profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/edit_profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/item_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/item_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/liked_items.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/liked_items.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/match_user_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/match_user_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/other_user_profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/other_user_profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,28 +71,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "django.template.preview.state": "SHOW_EDITOR",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "/home/seb/workspace/barter (copy)",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/seb/workspace/barter (copy)&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="barter" type="Python.DjangoServer" factoryName="Django server">
       <module name="barter" />
@@ -109,6 +147,8 @@
       <workItem from="1715283440222" duration="1467000" />
       <workItem from="1715330714907" duration="494000" />
       <workItem from="1716235835328" duration="457000" />
+      <workItem from="1716570815305" duration="7024000" />
+      <workItem from="1716584391430" duration="12223000" />
     </task>
     <servers />
   </component>

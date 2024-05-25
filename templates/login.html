@@ -1,17 +1,16 @@
 {% extends "base.html" %}
-
-<!-- Load the static files tag library to access static assets -->
 {% load static %}
 
 {% block content %}
-<h2>Login</h2>
+<div class="container my-4">
+    <h2>Login</h2>
 
-<!-- Login form using POST method -->
-<form method="post" id="loginForm">
-    {% csrf_token %}
-    {{ form.as_p }} <!-- Render the form fields as paragraph elements -->
-    <button type="submit">Login</button>
-</form>
+    <form method="post" id="loginForm" class="form-signin">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
     
-<script src="{% static 'js/login_geolocation.js' %}"></script>
+    <script src="{% static 'js/login_geolocation.js' %}"></script>
+</div>
 {% endblock %}

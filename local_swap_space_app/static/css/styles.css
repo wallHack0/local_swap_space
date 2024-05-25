@@ -1,0 +1,168 @@
+/* General styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f2efe9; /* Jasny kolor ecru */
+    height: 100%;
+}
+
+/* Centered container for the app */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Header */
+header {
+    width: 100%;
+    background-color: #f8f9fa; /* Jaśniejszy kolor nagłówka */
+    color: #343a40;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+}
+
+/* Navigation */
+.custom-nav {
+    background-color: #eae7dc; /* Ciemniejszy odcień ciepłego białego */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-nav .navbar-brand {
+    color: #343a40; /* Ciemniejszy kolor tekstu */
+}
+
+.custom-nav .navbar-brand:hover {
+    color: #343a40; /* Zachowanie koloru na hover */
+}
+
+.custom-nav .navbar-nav .nav-link {
+    color: #343a40; /* Ciemniejszy kolor tekstu */
+}
+
+.custom-nav .navbar-nav .nav-link:hover {
+    background-color: #d8d3c4; /* Jaśniejszy kolor podczas najechania */
+    border-radius: 5px;
+}
+
+/* Main content */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: left; /* Wyrównanie tekstu do lewej */
+}
+
+/* Form spacing */
+form.text-left {
+    width: 100%;
+}
+
+/* Card container */
+.card-container {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    margin-top: 20px;
+    perspective: 1000px;
+}
+
+/* Individual card */
+.card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card h2 {
+    margin: 15px 0 10px;
+    font-size: 24px;
+    color: #333;
+}
+
+.card p {
+    margin: 0 20px 15px;
+    font-size: 16px;
+    color: #777;
+}
+
+/* Hide all cards except the first one */
+.card:not(:first-child) {
+    display: none;
+}
+
+/* Action buttons */
+.actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.action-btn {
+    background-color: #eae7dc; /* Dopasowany kolor przycisków */
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+    background-color: #d8d3c4; /* Jaśniejszy kolor podczas najechania */
+}
+
+.action-btn.like {
+    color: #28a745;
+}
+
+.action-btn.dislike {
+    color: #35dcc9;
+}
+
+/* Footer */
+.custom-footer {
+    background-color: #f8f9fa; /* Jaśniejszy kolor stopki */
+    color: #343a40;
+    padding: 10px 0;
+}
+
+.custom-footer a {
+    color: #17a2b8;
+    text-decoration: none;
+}
+
+.custom-footer a:hover {
+    text-decoration: underline;
+}

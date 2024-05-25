@@ -22,7 +22,8 @@ from django.urls import path
 from local_swap_space_app.views import (RegisterView, CustomLoginView, DashboardView, ItemDetailView, AddItemView,
                                         ItemUpdateView, DeleteItemView, AddImageView, DeleteImageView, UserProfileView,
                                         EditUserProfileView, OtherUserProfileView, LikedItemsView, like_item,
-                                        MatchUserListView, ChatView, send_message, delete_chat_and_related_data)
+                                        MatchUserListView, ChatView, send_message, delete_chat_and_related_data,
+                                        update_location, ContactView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +31,7 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('update-location/', update_location, name='update_location'),
     path('item/<int:pk>/', ItemDetailView.as_view(), name='item-detail'),
     path('add_item/', AddItemView.as_view(), name='add_item'),
     path('item/edit/<int:pk>/', ItemUpdateView.as_view(), name='edit_item'),
@@ -45,6 +47,7 @@ urlpatterns = [
     path('delete-chat/<int:chat_id>/', delete_chat_and_related_data, name='delete_chat'),
     path('chat/<int:pk>/', ChatView.as_view(), name='chat_detail'),
     path('chat/<int:chat_id>/send_message/', send_message, name='send_message'),
+    path('contact/', ContactView.as_view(), name='contact'),
 
 ]
 

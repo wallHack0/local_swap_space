@@ -1,43 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Profile details section -->
-<h1>User profile: {{ profile_user.username }}</h1>
-<p>Email: {{ profile_user.email }}</p>
-<p>City: {{ profile_user.city }}</p>
+<div class="container my-4">
+    <h1>User profile: {{ profile_user.username }}</h1>
+    <p>Email: {{ profile_user.email }}</p>
+    <p>City: {{ profile_user.city }}</p>
 
-<!-- Rating form, shown only if the current user can rate this profile -->
-{% if can_rate %}
-<form method="post">
-  {% csrf_token %}
-  <label for="id_rating">Rating:</label>
-  {{ rating_form.rating }} <!-- Display the rating form -->
-  <button type="submit">Rate</button>
-</form>
-{% endif %}
+    {% if can_rate %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_rating">Rating:</label>
+            {{ rating_form.rating }}
+        </div>
+        <button type="submit" class="btn btn-primary">Rate</button>
+    </form>
+    {% endif %}
 
-<!-- Display current and average rating if available, otherwise show 'No ratings' -->
-{% if existing_rating %}
-<p>Current rating: {{ existing_rating }}</p>
-{% else %}
-<p>No ratings yet.</p>
-{% endif %}
+    {% if existing_rating %}
+    <p>Current rating: {{ existing_rating }}</p>
+    {% else %}
+    <p>No ratings yet.</p>
+    {% endif %}
     
-<p>Average rating: {{ average_rating }}</p>
+    <p>Average rating: {{ average_rating }}</p>
 
-<!-- List of items owned by the user -->
-<h2>User items</h2>
-<ul>
-  {% for item in items %}
-    <li>
-      <a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a> - {{ item.description }}
-      <!-- Display the first image of the item if available -->
-      {% if item.images.all %}
-        <img src="{{ item.images.all.0.image.url }}" alt="{{ item.name }}" style="width: 100px; height: auto;">
-      {% endif %}
-    </li>
-  {% empty %}
-    <li>User has no items yet.</li>
-  {% endfor %}
-</ul>
+    <h2>User items</h2>
+    <ul class="list-group">
+        {% for item in items %}
+        <li class="list-group-item">
+            <a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a> - {{ item.description }}
+            {% if item.images.all %}
+            <img src="{{ item.images.all.0.image.url }}" alt="{{ item.name }}" class="img-thumbnail" style="width: 100px; height: auto;">
+            {% endif %}
+        </li>
+        {% empty %}
+        <li class="list-group-item">User has no items yet.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

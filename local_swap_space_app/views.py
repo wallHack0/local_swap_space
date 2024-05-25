@@ -10,15 +10,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
 from django.contrib import messages
 from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, Avg, Prefetch
 from django.db import transaction
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.views.decorators.csrf import csrf_protect
+import json
+from django.http import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ItemForm, RatingForm, ItemImageForm, \
     CustomUserChangeForm
-from .models import Item, Category, User, Like, Match, Chat, Message, Rating, ItemImage
+from .models import Item, Category, User, Like, Match, Chat, Message, Rating, ItemImage, logger
 
 
 class RegisterView(FormView):
@@ -920,3 +923,57 @@ def delete_chat_and_related_data(request, chat_id):
 
         messages.success(request, "Chat and all related data have been successfully deleted.")
         return redirect('match_list')
+
+
+@login_required
+@csrf_protect
+def update_location(request):
+    """
+    View to update the location of the logged-in user.
+
+    This view expects a POST request with JSON payload containing 'latitude' and 'longitude'.
+    It validates the provided latitude and longitude, updates the user's location, and redirects to the dashboard.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the dashboard on successful update.
+        JsonResponse: Returns a JSON response with error details if the update fails.
+    """
+    if request.method == 'POST':
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            latitude = data.get('latitude')
+            longitude = data.get('longitude')
+
+            # Validate latitude and longitude
+            if not isinstance(latitude, (float, int)) or not isinstance(longitude, (float, int)):
+                return JsonResponse({'success': False, 'error': 'Latitude and longitude must be numbers'}, status=400)
+            if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
+                return JsonResponse({'success': False, 'error': 'Latitude or longitude out of range'}, status=400)
+
+            user = request.user
+            # Update user's location
+            user.latitude = latitude
+            user.longitude = longitude
+            user.location = Point(longitude, latitude, srid=4326)
+            user.save()
+
+            # Redirect to the dashboard after successful update
+            return HttpResponseRedirect(reverse('dashboard'))
+        except json.JSONDecodeError:
+            # Handle JSON decoding error
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            # Log the exception for further analysis
+            logger.error(f'Error updating location for user {request.user.username}: {str(e)}')
+            return JsonResponse({'success': False, 'error': 'An error occurred'}, status=400)
+
+    # Return error if the request method is not POST
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+class ContactView(TemplateView):
+    template_name = 'contact.html'

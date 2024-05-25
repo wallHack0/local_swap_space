@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 import environ
 from decouple import config
+from django.contrib import staticfiles
+from django.template.context_processors import static
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'local_swap_space_app.apps.LocalSwapSpaceAppConfig',
     'leaflet',
     'django.contrib.gis',
+    'sass_processor',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +138,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'local_swap_space_app/static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -150,7 +157,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so'
 
 LOGIN_URL = '/login/'
-
 
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (0, 0),

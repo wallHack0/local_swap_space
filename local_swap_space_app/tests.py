@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from PIL import Image
@@ -6,9 +7,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Avg
+from django.middleware.csrf import get_token
 from django.test import TestCase, Client
 from django.urls import reverse
 from local_swap_space_app.models import Category, Item, ItemImage, User, Like, Match, Rating, Chat, Message
+from django.contrib.gis.geos import Point
 
 
 class RegisterViewTests(TestCase):
@@ -364,7 +367,8 @@ class DeleteItemViewTest(TestCase):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.category = Category.objects.create(name='Test Category')
-        self.item = Item.objects.create(name='Test Item', description='Test description', category=self.category, owner=self.user)
+        self.item = Item.objects.create(name='Test Item', description='Test description', category=self.category,
+                                        owner=self.user)
 
     def test_delete_item_owner(self):
         self.client.login(username='testuser', password='testpassword')
@@ -640,3 +644,76 @@ class ChatDeleteTestCase(TestCase):
         response = self.client.get(url)  # Attempt a GET request instead of POST
         # Expecting some kind of HTTP error like 405 Method Not Allowed
         self.assertEqual(response.status_code, 405)
+
+
+class UpdateLocationViewTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser', password='testpass',
+            latitude=10.0, longitude=20.0,
+            location=Point(20.0, 10.0)
+        )
+        self.client.login(username='testuser', password='testpass')
+        self.url = reverse('update_location')
+
+    def test_update_location_authenticated(self):
+        response = self.client.post(self.url, json.dumps({
+            'latitude': 30.0,
+            'longitude': 40.0
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('dashboard'))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.latitude, 30.0)
+        self.assertEqual(self.user.longitude, 40.0)
+        self.assertEqual(self.user.location.x, 40.0)
+        self.assertEqual(self.user.location.y, 30.0)
+
+    def test_update_location_invalid_json(self):
+        response = self.client.post(self.url, 'invalid-json', content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {'success': False, 'error': 'Invalid JSON'})
+
+    def test_update_location_invalid_latitude_longitude(self):
+        response = self.client.post(self.url, json.dumps({
+            'latitude': 'invalid',
+            'longitude': 'invalid'
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {'success': False, 'error': 'Latitude and longitude must be numbers'})
+
+        response = self.client.post(self.url, json.dumps({
+            'latitude': 95.0,
+            'longitude': 195.0
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {'success': False, 'error': 'Latitude or longitude out of range'})
+
+    def test_update_location_unauthenticated(self):
+        self.client.logout()
+        response = self.client.post(self.url, json.dumps({
+            'latitude': 30.0,
+            'longitude': 40.0
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_location_other_user(self):
+        other_user = User.objects.create_user(
+            username='otheruser', password='otherpass',
+            latitude=50.0, longitude=60.0,
+            location=Point(60.0, 50.0)
+        )
+        self.client.login(username='otheruser', password='otherpass')
+        response = self.client.post(self.url, json.dumps({
+            'latitude': 30.0,
+            'longitude': 40.0
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('dashboard'))
+        other_user.refresh_from_db()
+        self.assertEqual(other_user.latitude, 30.0)
+        self.assertEqual(other_user.longitude, 40.0)
+        self.assertEqual(other_user.location.x, 40.0)
+        self.assertEqual(other_user.location.y, 30.0)

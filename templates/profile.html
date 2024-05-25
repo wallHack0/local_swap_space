@@ -1,34 +1,46 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block content %}
-  <!-- Displaying user details -->
-  <h1>User profile: {{ profile_user.username }}</h1>
-  <p>Email: {{ profile_user.email }}</p>
-  <p>City: {{ profile_user.city }}</p>
-  <p>Average rating: {{ average_rating }}</p>
-    
-  <a href="{% url 'add_item' %}">Add new item</a>
-  <a href="{% url 'edit_profile' %}">Edit profile</a>
+{% block title %}User Profile{% endblock %}
 
-  <!-- List of user's items -->
-  <h2>My items</h2>
-  <ul>
-    {% for item in items %}
-      <li>
-        <a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a> - {{ item.description }}
-        {% if item.images.all %}
-          <!-- Link and image for the item, wrapping image in a link -->
-          <a href="{% url 'item-detail' pk=item.pk %}">
-            <img src="{{ item.images.all.0.image.url }}" alt="{{ item.name }}" style="width:100px; height:auto;">
-          </a>
-        {% else %}
-          <!-- Fallback image if no images are associated with the item -->
-          <img src="{% static 'path/to/default/image.jpg' %}" alt="Default Image" style="width:100px; height:auto;">
-        {% endif %}
-      </li>
-    {% empty %}
-      <li>You have no items yet.</li>
-    {% endfor %}
-  </ul>
+{% block content %}
+<div class="container my-4">
+    <!-- Displaying user details -->
+    <h1 class="mb-4">User profile: {{ profile_user.username }}</h1>
+    <div class="mb-3">
+        <p><strong>Email:</strong> {{ profile_user.email }}</p>
+        <p><strong>City:</strong> {{ profile_user.city }}</p>
+        <p><strong>Average rating:</strong> {{ average_rating }}</p>
+    </div>
+
+    <div class="mb-4">
+        <a href="{% url 'add_item' %}" class="btn btn-primary">Add new item</a>
+        <a href="{% url 'edit_profile' %}" class="btn btn-secondary">Edit profile</a>
+    </div>
+
+    <!-- List of user's items -->
+    <h2 class="mb-4">My items</h2>
+    <ul class="list-group">
+        {% for item in items %}
+            <li class="list-group-item">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <a href="{% url 'item-detail' pk=item.pk %}" class="font-weight-bold">{{ item.name }}</a> - {{ item.description }}
+                    </div>
+                    <div class="ml-3">
+                        {% if item.images.all %}
+                            <a href="{% url 'item-detail' pk=item.pk %}">
+                                <img src="{{ item.images.all.0.image.url }}" alt="{{ item.name }}" class="img-thumbnail" style="width:100px; height:auto;">
+                            </a>
+                        {% else %}
+                            <img src="{% static 'path/to/default/image.jpg' %}" alt="Default Image" class="img-thumbnail" style="width:100px; height:auto;">
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item">You have no items yet.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

@@ -1,52 +1,72 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Ensures proper scaling and rendering on different devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title can be overridden by child templates -->
-    <title>{% block title %}My App{% endblock %}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>{% block title %}Local Swap Space{% endblock %}</title>
+    {% block extra_css %}
+    {% endblock %}
 </head>
 <body>
 <header>
-    <nav>
-        <!-- Navigation links for the website -->
-        <ul>
-            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'liked_items' %}">Liked Items</a></li>
-            <li><a href="{% url 'match_list' %}">Matches</a></li>
-            <li><a href="{% url 'profile' %}">My Profile</a></li>
-            <!-- Conditionally display navigation items based on user authentication status -->
-            {% if request.user.is_authenticated %}
-            <li>
-                <!-- Logout button -->
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit"
-                            style="background: none; border: none; padding: 0; color: blue; text-decoration: underline; cursor: pointer;">
-                        Logout
-                    </button>
-                </form>
-            </li>
-            {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-            <li><a href="{% url 'register' %}">Register</a></li>
-            {% endif %}
-        </ul>
+    <nav class="navbar navbar-expand-lg custom-nav">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'liked_items' %}">Liked Items</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'match_list' %}">Matches</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <form action="{% url 'logout' %}" method="post" class="form-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-dark">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </nav>
 </header>
 
-<main>
-    <!-- Main content block for child templates -->
+<main class="container py-4">
     {% block content %}
-    <!-- Placeholder -->
     {% endblock %}
 </main>
 
-<footer>
-    <!-- Footer information -->
+<footer class="custom-footer text-center py-3">
     <p>&copy; 2024 Sebastian S</p>
+    <p><a href="{% url 'contact' %}" class="text-info">Contact Us</a></p>
 </footer>
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% block extra_js %}
+{% endblock %}
 </body>
 </html>
